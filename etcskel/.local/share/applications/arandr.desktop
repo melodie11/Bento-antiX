@@ -1,0 +1,12 @@
+[Desktop Entry]
+Name=Display
+Name[fr]=Affichage
+GenericName=Screen Settings
+GenericName[de]=Bildschirmeinstellungen
+GenericName[fr]=Réglage de l'affichage
+Icon=display.png
+Exec=arandr
+Terminal=false
+Type=Application
+Categories=Settings;HardwareSettings;
+StartupNotify=true

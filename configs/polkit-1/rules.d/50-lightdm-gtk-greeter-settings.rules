@@ -1,0 +1,20 @@
+// /etc/polkit-1/rules.d/50-gtk-greeter-settings.rules
+// This rule allows members of the 'sudo' group to launch the
+// LightDM GTK+ Greeter configuration tool
+// using their own password, instead of the root password.
+
+polkit.addRule(function(action, subject) {
+    // We target the specific action for launching LightDM GTK greeter settings
+    if (action.id == "com.ubuntu.pkexec.lightdm-gtk-greeter-settings") {
+        // We check if the user requesting the action is a member of the 'sudo' group
+        if (subject.isInGroup("sudo")) {
+            // If yes, we authorize the action and request the user's password
+            // (AUTH_SELF means the current user's password)
+            return polkit.Result.AUTH_SELF;
+        }
+        // If the user is NOT in the 'sudo' group, this rule does not apply.
+        // PolicyKit will continue searching for other rules or apply the default behavior
+        // (which is generally to prompt for the admin password, as defined in the original .policy file).
+    }
+});
+

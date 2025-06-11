@@ -1,0 +1,12 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Comment=Creates an "INFORMATION.TXT" file on the live desktop
+Comment[fr]=Crée un fichier "INFORMATION.TXT" sur le bureau live
+Comment=Display the installation welcome message on the desktop
+Comment[fr]=Affiche le message de bienvenue d'installation sur le bureau
+Exec=welcome.sh
+StartupNotify=false
+Terminal=false
+Hidden=true
