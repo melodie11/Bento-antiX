@@ -72,3 +72,6 @@ nm-applet &
 # allumé après les 10 minutes. 
 # xset s off &
 # xset -dpms &
+
+sleep 2
+~/.screenlayout/vbox.sh &
