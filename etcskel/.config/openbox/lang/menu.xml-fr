@@ -90,8 +90,8 @@
 		<separator/>
 		<item icon="/usr/share/icons/hicolor/256x256/apps/synaptic.png" label="Synaptic">
 			<action name="Execute">
-x				<execute>
-					gksu -S synaptic
+				<execute>
+					pkexec synaptic
 				</execute>
 			</action>
 		</item>
