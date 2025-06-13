@@ -1,0 +1,10 @@
+# This is the /etc/default/zram file containing the %age 
+# of available ram you want to use to define the size 
+# of the zram block devices. 
+# See http://code.google.com/p/compcache/w/list
+# 25% for the configuration file should work for most
+# computers.
+# Exemple zram default configuration:
+FACTOR=50
+
+
