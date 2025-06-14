@@ -19,9 +19,8 @@ if [[ ! -d "${XDG_DESKTOP_DIR}" ]]; then
 fi
 
 # Are we in a live session? We want this to happen only in this case
-# This works in antiX respins. Else, it will need to be adapted.
+# This works in antiX respins - has to be checked elsewhere
 if	[ -d "/live" ]; then
-	cp -f "/usr/share/applications/minstall.desktop" "$XDG_DESKTOP_DIR"
-	cp -n "/rofs/usr/share/applications/minstall.desktop" "$XDG_DESKTOP_DIR"
+	install -m 755 "/usr/share/applications/minstall.desktop" "$XDG_DESKTOP_DIR"
 fi
 
