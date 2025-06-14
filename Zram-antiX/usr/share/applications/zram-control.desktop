@@ -1,0 +1,13 @@
+[Desktop Entry]
+Version=1.0
+Type=Application
+Name=ZRAM Control (Menu)
+Comment=Launch ZRAM control options (start, stop, status)
+Exec=toggle-zram-gui.sh
+Icon=utilities-system-monitor
+Terminal=false
+Categories=System;Utility;
+Keywords=zram;swap;memory;performance;control;
+StartupNotify=false
+Hidden=false
+
