@@ -1,0 +1,60 @@
+// /etc/polkit-1/rules.d/20-Udisks2-filesystem-mount.rules
+// This rule grants full UDisks2 access to users in the 'sudo' group
+// within active, local graphical sessions.
+
+polkit.addRule(function(action, subject) {
+    // Only apply this rule if the subject is an active, local user session.
+    // This prevents unintended authorizations for background processes or non-interactive users.
+    if (!subject.active || !subject.local || !subject.session) {
+        return polkit.Result.NOT_HANDLED;
+    }
+
+    // Check if the user requesting the action is a member of the 'sudo' group.
+    if (subject.isInGroup("sudo")) {
+        // Define a list of UDisks2 actions that should always be authorized for 'sudo' users.
+        var udisks2_actions = [
+            // Basic mounting and unmounting
+            "org.freedesktop.udisks2.filesystem-mount",            // Mount regular filesystems (internal, external)
+            "org.freedesktop.udisks2.filesystem-mount-system",     // Mount system partitions (e.g., other OS's root or boot)
+            "org.freedesktop.udisks2.filesystem-mount-other-seat", // Mount for users in other sessions/seats
+            "org.freedesktop.udisks2.filesystem-unmount-others",   // Unmount volumes mounted by other users
+
+            // Ejecting and detaching media
+            "org.freedesktop.udisks2.eject-media",                 // Eject general media (CD/DVD, USB drives)
+            "org.freedesktop.udisks2.eject-media-system",
+            "org.freedesktop.udisks2.eject-media-other-seat",
+            "org.freedesktop.udisks2.drive-eject",                 // Eject an entire drive (e.g., removable HDD)
+            "org.freedesktop.udisks2.drive-detach",                // Detach a drive (like hot-plugging SATA)
+
+            // Unlocking encrypted devices (e.g., LUKS volumes)
+            "org.freedesktop.udisks2.encrypted-unlock",
+            "org.freedesktop.udisks2.luks-unlock",                 // Specific LUKS unlock action
+            "org.freedesktop.udisks2.encrypted-unlock-system",
+            "org.freedesktop.udisks2.encrypted-unlock-other-seat",
+
+            // Loop device setup (for mounting image files as block devices)
+            "org.freedesktop.udisks2.loop-setup",
+
+            // Drive power management and configuration
+            "org.freedesktop.udisks2.drive-set-spindown",          // Set drive spindown time
+            "org.freedesktop.udisks2.power-off-drive",             // Power off a drive
+            "org.freedesktop.udisks2.power-off-drive-system",
+            "org.freedesktop.udisks2.power-off-drive-other-seat",
+
+            // Other general device management actions
+            "org.freedesktop.udisks2.rescan",                      // Rescan for new devices on the bus
+            "org.freedesktop.udisks2.open-device",                 // Open a device (e.g., for disk utilities)
+            "org.freedesktop.udisks2.open-device-system"
+        ];
+
+        // If the current action ID is in our list, authorize it without any authentication.
+        if (udisks2_actions.indexOf(action.id) !== -1) {
+            return polkit.Result.YES; // (YES means always authorize)
+        }
+    }
+
+    // If the user is not in the 'sudo' group, or the action is not in our list,
+    // Polkit will continue to look for other rules or apply the default behavior.
+    return polkit.Result.NOT_HANDLED;
+});
+

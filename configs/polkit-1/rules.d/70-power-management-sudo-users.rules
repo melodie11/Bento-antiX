@@ -1,0 +1,41 @@
+// /etc/polkit-1/rules.d/70-power-management-sudo-users.rules
+// This rule allows users in the 'sudo' group to control system power (shutdown, restart, suspend, hibernate)
+// without requiring further authentication, specific to ConsoleKit and UPower environments.
+
+polkit.addRule(function(action, subject) {
+    // Only apply this rule if the subject is an active, local user session.
+    // This prevents unintended authorizations for background processes or non-interactive users.
+    if (!subject.active || !subject.local || !subject.session) {
+        return polkit.Result.NOT_HANDLED;
+    }
+
+    // Check if the user is a member of the 'sudo' group.
+    if (subject.isInGroup("sudo")) {
+        // Define a comprehensive list of actions related to system power management.
+        var power_actions = [
+            // ConsoleKit actions (for systems using ConsoleKit)
+            "org.freedesktop.consolekit.system.stop",
+            "org.freedesktop.consolekit.system.stop-multiple-users",
+            "org.freedesktop.consolekit.system.restart",
+            "org.freedesktop.consolekit.system.restart-multiple-users",
+            "org.freedesktop.consolekit.system.suspend",
+            "org.freedesktop.consolekit.system.suspend-multiple-users",
+            "org.freedesktop.consolekit.system.hibernate",
+            "org.freedesktop.consolekit.system.hibernate-multiple-users",
+            "org.freedesktop.consolekit.system.hybridsleep",
+            "org.freedesktop.consolekit.system.hybridsleep-multiple-users",
+
+            // UPower actions (commonly used by desktop environments for suspend/hibernate)
+            "org.freedesktop.upower.suspend",
+            "org.freedesktop.upower.hibernate"
+        ];
+
+        // If the current action ID is in our list, authorize it without authentication.
+        if (power_actions.indexOf(action.id) !== -1) {
+            return polkit.Result.YES; // (YES means always authorize)
+        }
+    }
+
+    return polkit.Result.NOT_HANDLED;
+});
+
