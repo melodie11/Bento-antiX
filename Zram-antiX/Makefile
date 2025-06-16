@@ -2,106 +2,81 @@
 #
 # Variables
 DESTDIR ?= /
-PREFIX = /usr/local
-INITD_DIR = /etc/init.d
 DEFAULT_DIR = /etc/default
+INITD_DIR = /etc/init.d
+PREFIX = /usr/local
 APPS_DIR = /usr/share/applications
 
-# Files to install
-INIT_SCRIPT = etc/init.d/zram
+# Files to install (paths relative to the project root)
 DEFAULT_CONF = etc/default/zram
+INIT_SCRIPT = etc/init.d/zram
 GUI_SCRIPT = usr/local/bin/toggle-zram-gui.sh
 DESKTOP_FILE = usr/share/applications/zram-control.desktop
 POST_INSTALL_SCRIPT = post-install
-
-# Target directories
-INSTALL_INITD_DIR = $(DESTDIR)$(INITD_DIR)
-INSTALL_DEFAULT_DIR = $(DESTDIR)$(DEFAULT_DIR)
-INSTALL_GUI_DIR = $(DESTDIR)$(PREFIX)/bin
-INSTALL_APPS_DIR = $(DESTDIR)$(APPS_DIR)
-
-.PHONY: all install uninstall clean help
 
 all:
 	@echo "Type 'make install' to install ZRAM control scripts and configuration."
 	@echo "Type 'make uninstall' to remove them."
 
-install: directories copy_files permissions register_service update_db clean_polkit
+# Installation target
+install: copy_files permissions register_service update_db
+	@echo "Installation of ZRAM components complete."
 
-directories:
-	@echo "Creating installation directories..."
-	mkdir -p $(INSTALL_INITD_DIR)
-	mkdir -p $(INSTALL_DEFAULT_DIR)
-	mkdir -p $(INSTALL_GUI_DIR)
-	mkdir -p $(INSTALL_APPS_DIR)
-
+# Copies files from source to their destination within the system hierarchy
 copy_files:
 	@echo "Copying files..."
-	cp $(INIT_SCRIPT) $(INSTALL_INITD_DIR)/zram
-	cp $(DEFAULT_CONF) $(INSTALL_DEFAULT_DIR)/zram
-	cp $(GUI_SCRIPT) $(INSTALL_GUI_DIR)/toggle-zram-gui.sh
-	cp $(DESKTOP_FILE) $(INSTALL_APPS_DIR)/zram-control.desktop
+	cp $(DEFAULT_CONF) $(DESTDIR)$(DEFAULT_DIR)/zram
+	cp $(INIT_SCRIPT) $(DESTDIR)$(INITD_DIR)/zram
+	cp $(GUI_SCRIPT) $(DESTDIR)$(PREFIX)/bin/toggle-zram-gui.sh
+	cp $(DESKTOP_FILE) $(DESTDIR)$(APPS_DIR)/zram-control.desktop
 
+# Sets the appropriate file permissions for installed files
 permissions:
 	@echo "Setting file permissions..."
-	chmod 755 $(INSTALL_INITD_DIR)/zram
-	chmod 755 $(INSTALL_GUI_DIR)/toggle-zram-gui.sh
-	# Configuration file and desktop file don't need executable bits
-	chmod 644 $(INSTALL_DEFAULT_DIR)/zram
-	chmod 644 $(INSTALL_APPS_DIR)/zram-control.desktop
+	chmod 644 $(DESTDIR)$(DEFAULT_DIR)/zram           # Configuration file
+	chmod 755 $(DESTDIR)$(INITD_DIR)/zram             # Init script needs executable permission
+	chmod 755 $(DESTDIR)$(PREFIX)/bin/toggle-zram-gui.sh # GUI script needs executable permission
+	chmod 644 $(DESTDIR)$(APPS_DIR)/zram-control.desktop # Desktop file
 
+# Registers the ZRAM service using the post-install script
 register_service:
-	@echo "Registering ZRAM service with update-rc.d..."
-	$(DESTDIR)$(POST_INSTALL_SCRIPT) # Execute your existing post-install script
+	@echo "Registering ZRAM service..."
+	# The post-install script is responsible for running update-rc.d or similar
+	# and handling ZRAM setup (e.g., enabling/starting the service).
+	# Ensure this script is executable and handles the DESTDIR if packaging.
+	$(DESTDIR)$(POST_INSTALL_SCRIPT)
 
+# Updates the desktop file database for application menus
 update_db:
 	@echo "Updating desktop database..."
-	update-desktop-database $(INSTALL_APPS_DIR) # Specify directory for safety
+	update-desktop-database $(DESTDIR)$(APPS_DIR)
 
-clean_polkit:
-	@echo "Cleaning up Polkit rule for gksu..."
-	rm -f $(DESTDIR)/etc/polkit-1/rules.d/05-zram-no-root-password.rules
-	@if [ -x "$(DESTDIR)/usr/lib/polkit-1/polkitd" ]; then \
-	    echo "Restarting Polkit daemon..."; \
-	    $(DESTDIR)/usr/lib/polkit-1/polkitd --no-debug & \
-	else \
-	    echo "Polkit daemon not found, skipping restart."; \
-	fi
-
-uninstall: unregister_service remove_files clean_polkit_uninstall update_db
+# Uninstallation target
+uninstall: unregister_service remove_files update_db
 	@echo "Uninstallation complete. You may need to reboot or log out/in."
 
+# Unregisters the ZRAM service
 unregister_service:
-	@echo "Unregistering ZRAM service with update-rc.d..."
-	update-rc.d zram remove || true # '|| true' to avoid error if not registered
+	@echo "Unregistering ZRAM service..."
+	# '|| true' prevents the make process from failing if the service isn't found
+	update-rc.d zram remove || true
 
+# Removes the installed files from the system
 remove_files:
 	@echo "Removing installed files..."
-	rm -f $(INSTALL_INITD_DIR)/zram
-	rm -f $(INSTALL_DEFAULT_DIR)/zram
-	rm -f $(INSTALL_GUI_DIR)/toggle-zram-gui.sh
-	rm -f $(INSTALL_APPS_DIR)/zram-control.desktop
+	rm -f $(DESTDIR)$(DEFAULT_DIR)/zram
+	rm -f $(DESTDIR)$(INITD_DIR)/zram
+	rm -f $(DESTDIR)$(PREFIX)/bin/toggle-zram-gui.sh
+	rm -f $(DESTDIR)$(APPS_DIR)/zram-control.desktop
 
-clean_polkit_uninstall:
-	@echo "Cleaning up Polkit rule during uninstall..."
-	# This should ideally be done by the post-install/post-remove script of the package
-	# but added here for completeness if manual uninstall.
-	rm -f $(DESTDIR)/etc/polkit-1/rules.d/05-zram-no-root-password.rules
-	@if [ -x "$(DESTDIR)/usr/lib/polkit-1/polkitd" ]; then \
-	    echo "Restarting Polkit daemon..."; \
-	    $(DESTDIR)/usr/lib/polkit-1/polkitd --no-debug & \
-	else \
-	    echo "Polkit daemon not found, skipping restart."; \
-	fi
-
+# Help message for users
 help:
 	@echo "Makefile for ZRAM_antiX project."
 	@echo ""
 	@echo "Usage:"
 	@echo "  make install     - Installs ZRAM scripts, configuration, and desktop entry."
 	@echo "  make uninstall   - Removes ZRAM components."
-	@echo "  make clean       - (No files to clean for this project)"
+	@echo "  make clean       - (No files to clean for this project, just an empty target for convention)"
 	@echo ""
 	@echo "To install to a specific root directory (for packaging):"
 	@echo "  make install DESTDIR=/path/to/staging/root"
-
