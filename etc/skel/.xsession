@@ -22,7 +22,8 @@ if [[ -z `pidof gpg-agent` ]]; then
 # ...or the Window Manager of your choice
 
 # if used with lxdm, slim, or nodm
-# exec dbus-launch openbox-session &>~/.xsession-errors
+# or if not using SystemD
+exec ck-launch-session dbus-launch openbox-session &>~/.xsession-errors
 
 # if used with lightdm
-exec openbox-session &>~/.xsession-errors
+# exec openbox-session &>~/.xsession-errors
