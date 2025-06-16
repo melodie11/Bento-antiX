@@ -155,7 +155,7 @@ distribution.
 ## Prebuilt distributions
 Some Bento Openbox Remix (built on Ubuntu) editions have been made available at
 [Linuxvillage](https://linuxvillage.org) here and then since 2012 and some
-built from antiX Linux since the last years. You can follow [Linuxvillage](https://linuxvillage.org)
+built from antiX Linux since around 2021. You can follow [Linuxvillage](https://linuxvillage.org)
 to keep posted if you'd like to.
 
 If you use it in a new distribution or in a remix of your's, we'd love to hear
@@ -180,52 +180,18 @@ live session.
 Additional themes for Openbox and for icons are included and installed by
 default using the Makefile. You can change it as you like best.
 
-### Plymouth theme
-A dedicated plymouth theme will be installed in the system, but it will need to
-be selected.
-
-We built a script, called from the Makefile, to make it easier. You can use it
-to install the new Plymouth theme, then to change for another Plymouth theme at
-any time.
-
-You need to switch theme first if you  decide to uninstall the whole Bento
-Openbox setup. You can use the Makefile to do that, using the `make clean`
-command from within the bundle directory.
-
-If you prefer to use command lines:
-There are 2 directories: *bento-logo* and *bento-text* and there must have 2
-symlinks created with relevant command lines. How to do that:
-In the console su or sudo to root, then after all files have been copied into
-`/usr/share/plymouth/themes`:
-
-```bash
-# rsync -r bento-logo bento-text /usr/share/plymouth/themes/                   
-# update-alternatives --install /usr/share/plymouth/themes/default.plymouth default.plymouth /usr/share/plymouth/themes/bento-logo/bento-logo.plymouth 100
-#
-```
-
-The `update-alternatives` command line is a sequence of instructions composed
-with : *link name, name, path, priority*. The priority number can be adapted.
-
-The next command line allows checking the result while displaying the list
-of themes and their priorities.
-`# update-alternatives --config default.plymouth`
-
-The initramfs needs to be updated:
-`# update-initramfs -u`
-
 ### Other files
 You will find them abundantly commented in the Makefile.
 
 ## Final details
 
-The keyboard-configuration.desktop (from etcskel/.local/share/applications)
+The keyboard-configuration.desktop (from etc/skel/.local/share/applications)
 starts a terminal with a `dpkg-reconfigure` command line, can be removed if not
 needed.
 
-In some distributions, the Synaptic package manager is started with `synaptic-pkexec`
-If so, the `exec synaptic` line in the menu.xml files need to be adapted.
-(`synaptic-pkexec` instead of `sudo -S synaptic`, for example).
+In Bento antiX, the Synaptic package manager is started with `gksu -S`, as
+are most GUI applications needing administration rights. This way you don't need
+the root account to be activated.
 
 ## Last advice
 You won't need a full fledged Desktop Manager in your distribution prior to
