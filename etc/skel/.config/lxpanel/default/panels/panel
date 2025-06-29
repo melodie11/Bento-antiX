@@ -6,9 +6,9 @@ Global {
   allign=center
   margin=0
   widthtype=percent
-  width=99
-  height=28
-  transparent=1
+  width=85
+  height=30
+  transparent=0
   tintcolor=#000000
   alpha=122
   autohide=0
@@ -19,9 +19,9 @@ Global {
   fontsize=10
   fontcolor=#ffffff
   usefontsize=0
-  background=0
-  backgroundfile=/usr/share/bento/lxpanel/bg3.png
-  iconsize=26
+  background=1
+  backgroundfile=/usr/share/bento/lxpanel/panel-background_sushi_x86_64.png
+  iconsize=30
   loglevel=2
 }
 Plugin {
@@ -85,15 +85,26 @@ Plugin {
   type=space
   Config {
   }
+  expand=1
+}
+Plugin {
+  type=pager
+  Config {
+  }
 }
 Plugin {
   type=space
   Config {
   }
-  expand=1
+  expand=0
 }
 Plugin {
   type=tray
+  Config {
+  }
+}
+Plugin {
+  type=space
   Config {
   }
 }
@@ -102,9 +113,9 @@ Plugin {
   Config {
     ClockFmt=%R
     TooltipFmt=%A %x
-    BoldFont=0
+    BoldFont=1
     IconOnly=0
-    CenterText=0
+    CenterText=1
   }
 }
 Plugin {
@@ -112,4 +123,3 @@ Plugin {
   Config {
   }
 }
-
