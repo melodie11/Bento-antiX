@@ -39,173 +39,154 @@
 #
 #  To remove, type `make uninstall` also using administration rights. 
 #  Before doing so, we advice you check carefully in the lower part of
-# this file what is to be removed
+#  this file what is to be removed
 
+#  If installing in a running system, use `rsync -rl /etc/skel /home/you` after
+#  the `make install` part. Also the `make clean` does not remove all that was
+#  installed. It is up to you to check what more should be removed.
 
 SHELL := /bin/bash
 
-# Base Destination Directory (for packaging support)
-DESTDIR ?= /
+## Source Files and Directories (relative to the project root)
+# etc/
+ETC_SRC_DIR=etc
+ETC_SKEL_SRC=etc/skel
+ETC_LIGHTDM_CONF_D_SRC=etc/lightdm/lightdm.conf.d
+ETC_POLKIT_RULES_D_SRC=etc/polkit-1/rules.d
+ETC_SUDOERS_D_SRC=etc/sudoers.d
+ETC_XDG_AUTOSTART_SRC=etc/xdg/autostart
+ETC_XDG_MENUS_SRC=etc/xdg/menus
 
-# Specific /etc and its sub-directories
-DEST_ETC = $(DESTDIR)/etc
-DEST_ETC_LIGHTDM = $(DESTDIR)/etc/lightdm
-DEST_ETC_LIGHTDM_CONF_D = $(DESTDIR)/etc/lightdm.conf.d
-DEST_ETC_POLKIT_RULES_D = $(DESTDIR)/etc/polkit-1/rules.d
-DEST_ETC_SKEL = $(DESTDIR)/etc/skel
-DEST_ETC_SUDOERS_D = $(DESTDIR)/etc/sudoers.d
-DEST_ETC_XDG_AUTOSTART = $(DESTDIR)/etc/xdg/autostart
-DEST_ETC_XDG_MENUS = $(DESTDIR)/etc/xdg/menus
-DEST_VAR_LIB = $(DESTDIR)/var/lib
-
-# Specific sub-directories under /usr
-DEST_USR_LOCAL_BIN = /usr/local/bin
-DEST_USR_SHARE = /usr/share
-DEST_USR_SHARE_ICONS = /usr/share/icons
-DEST_USR_SHARE_THEMES = /usr/share/themes
-DEST_USR_SHARE_BENTO = /usr/share/bento
-
-# --- Source Paths (relative to project root './') ---
-
-# Source directories
-SRC_ETC = etc
-SRC_LIGHTDM_CONF_D = etc/lighdm/lightdm.conf.d
-SRC_ETC_SUDOERS_D = etc/sudoers.d/
-SRC_ETCSKEL = etc/skel
-SRC_ETC_XDG_AUTOSTART = etc/xdg/autostart
-SRC_ETC_XDG_MENUS = etc/xdg/menus
-SRC_BENTO = usr/share/bento
-SRC_ICONS = usr/share/icons
-SRC_POLKIT_RULES = etc/polkit-1/rules.d
-SRC_THEMES = usr/share/themes
+# usr/
+USR_LOCAL_BIN_SRC=usr/local/bin
+USR_SHARE_BENTO_SRC=usr/share/bento
+USR_SHARE_ICONS_SRC=usr/share/icons
+USR_SHARE_THEMES_SRC=usr/share/themes
 
 
-# Main targets
-all:
-	@echo "Type 'make install' to install Bento antiX components."
-	@echo "Type 'make uninstall' to remove them."
+## Destination Directories (absolute paths on the system)
+ETC=/etc
+ETC_XDG_MENUS=/etc/xdg/menus
+ETC_LIGHTDM_CONF_D=/etc/lightdm/lightdm.conf.d
+ETC_POLKIT_RULES_D=/etc/polkit-1/rules.d
+ETC_SKEL=/etc/skel
+USR_LOCAL_BIN=/usr/local/bin
+USR_SHARE=/usr/share
+USR_SHARE_BENTO=/usr/share/bento
+USR_SHARE_ICONS=/usr/share/icons
+USR_SHARE_THEMES=/usr/share/themes
 
+## INSTALL
 install:
-	echo "Installing Bento antiX components..."
+	@echo "Installing Bento antiX components..."
 
-	# Create specific destination directory required for installation
-	# lightdm `data` directory was missing in antiX 23.2 core 32 sysvinit
-	mkdir -p $(DEST_VAR_LIB)/lightdm/data
-
-
-	# Copy individual files under /etc - if inittab already has `5` in
-	# the line `id:5:initdefault:` then comment out the one below
-	install -m 644 $(SRC_ETC)/environment $(DEST_ETC)/
-	install -m 644 $(SRC_ETC)/inittab $(DEST_ETC)/
-
-	# Copy LightDM config files and set permissions
-	rsync -r $(SRC_LIGHTDM_CONF_D) $(DEST_ETC_LIGHTDM_CONF_D)/
-	find $(DEST_ETC_LIGHTDM_CONF_D)/ -type f -exec chmod 644 {} \;
-
-	# Copy Polkit rules files and set permissions
-	rsync -r $(SRC_POLKIT_RULES) $(DEST_ETC_POLKIT_RULES_D)/
-	find $(DEST_ETC_POLKIT_RULES_D)/ -type f -exec chmod 644 {} \;
-
-	# Copy sudoers.d file and set permissions
-	install -m 644 $(SRC_ETC_SUDOERS_D)/keep_qt_env $(DEST_ETC_SUDOERS_D)/
-
-	# Copy XDG autostart files and set permissions
-	rsync -r $(SRC_ETC_XDG_AUTOSTART) $(DEST_ETC_XDG_AUTOSTART)/
-	find $(DEST_ETC_XDG_AUTOSTART)/ -type f -exec chmod 644 {} \;
+# /etc/environment and /etc/inittab
+	install -m 644 "$(ETC_SRC_DIR)"/environment "$(ETC)"/
+	install -m 644 "$(ETC_SRC_DIR)"/inittab "$(ETC)"/
 	
-	# To copy etc/xdg/autostart/welcome-information.desktop if needed:
-	# use the preceeding rsync command with the "--exclude=welcome-information.desktop" 
-	# option.
+# Folders and files from etc/skel go to /etc/skel
+# Use rsync -r because symlinks will be created explicitly afterwards.
+	rsync -r "$(ETC_SKEL_SRC)"/ "$(ETC_SKEL)"/
 
-	# Copy XDG menus file and set permissions (single file, using install directly)
-	install -m 644 $(SRC_ETC_XDG_MENUS)/bento-applications.menu $(DEST_ETC_XDG_MENUS)/
-	ln -s $(DEST_ETC_XDG_MENUS)/bento-applications.menu $(DEST_ETC_XDG_MENUS)/applications.menu
+# Create symlinks for Openbox config files in /etc/skel/.config/openbox
+	ln -s "$(ETC_SKEL)"/.config/openbox/lang/autostart-en "$(ETC_SKEL)"/.config/openbox/autostart
+	ln -s "$(ETC_SKEL)"/.config/openbox/lang/menu.xml-en "$(ETC_SKEL)"/.config/openbox/menu.xml
+	ln -s "$(ETC_SKEL)"/.config/openbox/lang/rc.xml-en "$(ETC_SKEL)"/.config/openbox/rc.xml
 
-	# Copy usr/local/bin scripts/binaries and set permissions
-	rsync -r usr/local/bin/ $(DEST_USR_LOCAL_BIN)/
-	find $(DEST_USR_LOCAL_BIN)/ -type f -exec chmod 755 {} \;
-	# To copy usr/local/bin/welcome.sh if needed:
-	# install -m 755 usr/local/bin/welcome.sh $(DEST_USR_LOCAL_BIN)/welcome.sh
+# Set executable permission for oblocale.sh
+	chmod a+x "$(ETC_SKEL)"/.config/openbox/scripts/oblocale.sh
 
-	# Copy recursive directories using rsync
-	rsync -rl $(SRC_ETCSKEL) $(DEST_ETC_SKEL)
-	rsync -r $(SRC_BENTO) $(DEST_USR_SHARE_BENTO)
-	rsync -rl $(SRC_ICONS) $(DEST_USR_SHARE_ICONS)
-	rsync -rl $(SRC_THEMES) $(DEST_USR_SHARE_THEMES)
+# XDG menus file (etc/xdg/menus/bento-applications.menu)
+	install -m 644 "$(ETC_XDG_MENUS_SRC)"/bento-applications.menu "$(ETC_XDG_MENUS)"/
+	# Also create the applications.menu symlink - This symlink will now be created here, not copied by rsync -l
+	ln -s "$(ETC_XDG_MENUS)"/bento-applications.menu "$(ETC_XDG_MENUS)"/applications.menu
 
-	# Reset file permissions for contents copied recursively
-	find $(DEST_ETC_SKEL) -type f -exec chmod 644 {} \;
-	find $(DEST_ETC_SKEL) -type d -exec chmod 755 {} \;
-	chmod +x $(DEST_ETC_SKEL)/.config/openbox/scripts/oblocale.sh
-	chmod +x $(DEST_ETC_SKEL)/.config/openbox/lang/autostart-*
-	
-	find $(DEST_USR_SHARE_BENTO) -type f -exec chmod 644 {} \;
-	find $(DEST_USR_SHARE_BENTO) -type d -exec chmod 755 {} \;
+# LightDM configuration files
+	mkdir -p "$(ETC_LIGHTDM_CONF_D)"
+	install -m 644 "$(ETC_LIGHTDM_CONF_D_SRC)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf} "$(ETC_LIGHTDM_CONF_D)"/
 
-	find $(DEST_USR_SHARE_ICONS) -type f -exec chmod 644 {} \;
-	find $(DEST_USR_SHARE_ICONS) -type d -exec chmod 755 {} \;
+# Polkit rules files
+	# Use rsync -r as no symlinks are expected in rules files themselves, only recursive copy.
+	rsync -r "$(ETC_POLKIT_RULES_D_SRC)"/ "$(ETC_POLKIT_RULES_D)"/
+	find "$(ETC_POLKIT_RULES_D)"/ -type f -exec chmod 644 {} \; # Set permissions for rule files
 
-	find $(DEST_USR_SHARE_THEMES) -type f -exec chmod 644 {} \;
-	find $(DEST_USR_SHARE_THEMES) -type d -exec chmod 755 {} \;
+# XDG autostart files
+	# Use rsync -r as no symlinks are expected in autostart files themselves.
+	rsync -r "$(ETC_XDG_AUTOSTART_SRC)"/ "$(ETC)"/xdg/autostart/
+	find "$(ETC)"/xdg/autostart/ -type f -exec chmod 644 {} \; # Set permissions for files
 
-	# Setup LightDM data directory rights and permissions
-	chown lightdm:lightdm $(DEST_VAR_LIB)/lightdm/data
-	chmod 750 $(DEST_VAR_LIB)/lightdm/data
+# Scripts for /usr/local/bin
+	# Use rsync -r as no symlinks are expected in scripts themselves.
+	rsync -r "$(USR_LOCAL_BIN_SRC)"/ "$(USR_LOCAL_BIN)"/
+	find "$(USR_LOCAL_BIN)"/ -type f -exec chmod 755 {} \; # Ensures scripts are executable
 
-	# Update desktop database
-	update-desktop-database $(DEST_ETC_XDG_AUTOSTART)
-	update-desktop-database $(DEST_USR_SHARE_BENTO)/applications
+# Bento theme files for /usr/share/bento
+	# Use rsync -r as no symlinks are expected here.
+	rsync -r "$(USR_SHARE_BENTO_SRC)"/ "$(USR_SHARE_BENTO)"/
+	find "$(USR_SHARE_BENTO)"/ -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_BENTO)"/ -type d -exec chmod 755 {} \; # Ensure directories are traversable
+
+# Openbox additional themes for /usr/share/themes
+	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
+	rsync -rl "$(USR_SHARE_THEMES_SRC)"/ "$(USR_SHARE_THEMES)"/
+	find "$(USR_SHARE_THEMES)"/ -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_THEMES)"/ -type d -exec chmod 755 {} \;
+
+# Icon sets for /usr/share/icons
+	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
+	rsync -rl "$(USR_SHARE_ICONS_SRC)"/ "$(USR_SHARE_ICONS)"/
+	find "$(USR_SHARE_ICONS)"/ -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_ICONS)"/ -type d -exec chmod 755 {} \;
+
+## UNINSTALL
+clean:
+	@echo "Starting uninstallation…"
 
 
-uninstall:
-	echo "Removing Bento antiX components..."
+# Remove files/folders copied to /etc/skel by your project (selective removal)
+	rm -rf "$(ETC_SKEL)"/.bash_logout
+	rm -rf "$(ETC_SKEL)"/.jgmenurc
+	rm -rf "$(ETC_SKEL)"/.vimrc
+	rm -rf "$(ETC_SKEL)"/.Xdefaults
+	rm -rf "$(ETC_SKEL)"/.xinitrc
+	rm -rf "$(ETC_SKEL)"/.Xresources
+	rm -rf "$(ETC_SKEL)"/.xsession
+	rm -rf "$(ETC_SKEL)"/.config/openbox
 
-	# DO NOT ! Remove `/etc/environment` or `/etc/inittab` !
-	
-	# Remove these two only if needed
-	# rm -f $(DEST_ETC_LIGHTDM_CONF_D)/01_debian.conf
-	# rm -f $(DEST_ETC_LIGHTDM_CONF_D)/0_bento.conf
-	rm -f $(DEST_ETC_LIGHTDM_CONF_D)/lightdm.conf
-	rm -f $(DEST_ETC_LIGHTDM_CONF_D)/lightdm-gtk-greeter.conf
+# Remove XDG menus files and symlink (bento-applications.menu and its symlink)
+	rm -f "$(ETC_XDG_MENUS)"/bento-applications.menu
+	rm -f "$(ETC_XDG_MENUS)"/applications.menu # The symlink
 
-	## Either one file at a time or as a batch : choose!
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/20-Udisks2-filesystem-mount.rules
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/30-policykit-pkexec-auth.rules
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/40-gparted-sudo-auth.rules
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/50-lightdm-gtk-greeter-settings.rules
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/60-synaptic-sudo-rules
-	# 	rm -f $(DEST_ETC_POLKIT_RULES_D)/70-power-management-sudo-users.rules
-	rm -f  $(DEST_ETC_POLKIT_RULES_D)/*.rules
+# Remove LightDM configuration files
+	rm -f "$(ETC_LIGHTDM_CONF_D)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf}
 
-	# We might want to keep it, can't hurt
-	# rm -f $(DEST_ETC_SUDOERS_D)/keep_qt_env
+# Polkit rules files
+	rm -f "$(ETC_POLKIT_RULES_D)"/{20-Udisks2-filesystem-mount.rules,30-policykit-pkexec-auth.rules,40-gparted-sudo-auth.rules,50-lightdm-gtk-greeter-settings.rules,60-synaptic-sudo-auth.rules,70-power-management-sudo-users.rules}
 
-	rm -f $(DEST_ETC_XDG_AUTOSTART)/connman-gtk.desktop
-	rm -f $(DEST_ETC_XDG_AUTOSTART)/cp-minstall-launcher.desktop
-	rm -f $(DEST_ETC_XDG_AUTOSTART)/fix-network-live.desktop
-	rm -f $(DEST_ETC_XDG_AUTOSTART)/welcome-information.desktop
+# Remove XDG autostart files
+	rm -f "$(ETC)"/xdg/autostart/{connman-gtk.desktop,cp-minstall-launcher.desktop,fix-network-live.desktop,welcome-information.desktop}
 
-	## Restore your applications.menu afterwards
-	rm -f $(DEST_ETC_XDG_MENUS)/bento-applications.menu
-	
-	## check any script you would want to keep
-	rm -f $(DEST_USR_LOCAL_BIN)/bento-antix.desktop.sh
-	rm -f $(DEST_USR_LOCAL_BIN)/fix-network-live.sh
-	rm -f $(DEST_USR_LOCAL_BIN)/openbox-menu
-	rm -f $(DEST_USR_LOCAL_BIN)/xcompmgr.sh
-	rm -f $(DEST_USR_LOCAL_BIN)/xsnow.sh
-	rm -f $(DEST_USR_LOCAL_BIN)/welcome.sh
+# Remove scripts from /usr/local/bin
+	rm -f "$(USR_LOCAL_BIN)"/{bento-antix.desktop.sh,fix-network-live.sh,openbox-menu,welcome.sh,xcompmgr.sh,xsnow.sh}
 
-	# Remove directories recursively
-	rm -rf $(DEST_USR_SHARE_BENTO)
-	
-	# The `Vibrantly-Simple-Dark-Pink` and `Vibrantly-Simple-Dark-Teal` icon sets
-	rm -rf $(DEST_USR_SHARE_ICONS)/{Vibrantly*}
-	
-	# Openbox additional themes were in `/usr/share/themes`
-	rm -rf $(DEST_USR_SHARE_THEMES)/{Imagine*}
+# Remove /usr/share/bento directory
+	rm -rf "$(USR_SHARE_BENTO)"
 
-	# Folders and files from the etcskel directory were in `/etc/skel`
-	rm -rf $(DEST_ETC_SKEL)/{.config,.local,.bash_logout,.bashrc,.gtkrc-2.0,.jgmenurc,.profile,.vimrc,.Xdefaults,.xinitrc,.Xresources,.xsession}
+# Remove Openbox additional themes
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Ambiance'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Clearlooks'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine CurvedDark'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine CurvedLight'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Eight'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine FlatCarbon'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine FlatSuperwhite'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Human'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Radiance'
+	rm -rf "$(USR_SHARE_THEMES)"/'Imagine Seven'
 
-	# Do NOT remove /var/lib/lightdm/data as it's managed by the system's LightDM package.
+# Remove icon sets
+	rm -f "$(USR_SHARE_ICONS)"/keyboard.png
+	rm -f "$(USR_SHARE_ICONS)"/run.png
+	rm -f "$(USR_SHARE_ICONS)"/run.svg
+	rm -rf "$(USR_SHARE_ICONS)"/Vibrantly-Simple-Dark-Pink
+	rm -rf "$(USR_SHARE_ICONS)"/Vibrantly-Simple-Dark-Teal
