@@ -51,12 +51,13 @@ SHELL := /bin/bash
 # etc/
 ETC_SRC=etc
 ETC_DEFAULT_SRC=etc/default/grub
-ETC_SKEL_SRC=etc/skel
+ETC_LIGHTDM_CONF_SRC=etc/lightdm/lightdm-gtk-greeter.conf
 ETC_LIGHTDM_CONF_D_SRC=etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D_SRC=etc/polkit-1/rules.d
 ETC_SUDOERS_D_SRC=etc/sudoers.d
+ETC_SKEL_SRC=etc/skel
 ETC_XDG_AUTOSTART_SRC=etc/xdg/autostart
-ETC_XDG_MENUS_SRC=etc/xdg/menus
+ETC_XDG_MENUS_SRC=etc/xdg/menus/bento-applications.menu
 
 # usr/
 USR_LOCAL_BIN_SRC=usr/local/bin
@@ -64,11 +65,12 @@ USR_SHARE_BENTO_SRC=usr/share/bento
 USR_SHARE_ICONS_SRC=usr/share/icons
 USR_SHARE_THEMES_SRC=usr/share/themes
 
-
 ## Destination Directories (absolute paths on the system)
 ETC=/etc
 ETC_DEFAULT=/etc/default/
+ETC_XDG_AUTOSTART=/etc/xdg/autostart
 ETC_XDG_MENUS=/etc/xdg/menus
+ETC_LIGHTDM_CONF=/etc/lightdm
 ETC_LIGHTDM_CONF_D=/etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D=/etc/polkit-1/rules.d
 ETC_SKEL=/etc/skel
@@ -83,18 +85,27 @@ install:
 	@echo "Installing Bento antiX components..."
 
 # /etc/environment and /etc/inittab
-	install -m 644 "$(ETC_SRC)"/environment "$(ETC)"/
-	install -m 644 "$(ETC_SRC)"/inittab "$(ETC)"/
+	install -m 644 "$(ETC_SRC)"/environment "$(ETC)"
+	install -m 644 "$(ETC_SRC)"/inittab "$(ETC)"
 
 # Grub without background
 	install -m 644 "$ETC_DEFAULT_SRC" "$ETC_DEFAULT"
 
 	@echo "Updating Grub"
 	update-grub2
+
+# LightDM configuration files
 	
+	install -m 644 "$ETC_LIGHTDM_CONF_SRC" "$ETC_LIGHTDM_CONF"
+	install -m 644 "$(ETC_LIGHTDM_CONF_D_SRC)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf} "$(ETC_LIGHTDM_CONF_D)"/
+
+# Polkit rules files
+	# Use rsync -r as no symlinks are expected in rules files themselves, only recursive copy.
+	rsync -r "$(ETC_POLKIT_RULES_D_SRC)"/ "$(ETC_POLKIT_RULES_D)"
+	find "$(ETC_POLKIT_RULES_D)"/ -type f -exec chmod 644 {} \;
+
 # Folders and files from etc/skel go to /etc/skel
-# Use rsync -r because symlinks will be created explicitly afterwards.
-	rsync -r "$(ETC_SKEL_SRC)"/ "$(ETC_SKEL)"/
+	rsync -r "$(ETC_SKEL_SRC)"/ "$(ETC_SKEL)"
 
 # Create symlinks for Openbox config files in /etc/skel/.config/openbox
 	ln -s "$(ETC_SKEL)"/.config/openbox/lang/autostart-en "$(ETC_SKEL)"/.config/openbox/autostart
@@ -104,35 +115,26 @@ install:
 # Set executable permission for oblocale.sh
 	chmod a+x "$(ETC_SKEL)"/.config/openbox/scripts/oblocale.sh
 
-# XDG menus file (etc/xdg/menus/bento-applications.menu)
-	install -m 644 "$(ETC_XDG_MENUS_SRC)"/bento-applications.menu "$(ETC_XDG_MENUS)"/
-	# Also create the applications.menu symlink - This symlink will now be created here, not copied by rsync -l
-	ln -s "$(ETC_XDG_MENUS)"/bento-applications.menu "$(ETC_XDG_MENUS)"/applications.menu
-
-# LightDM configuration files
-	mkdir -p "$(ETC_LIGHTDM_CONF_D)"
-	install -m 644 "$(ETC_LIGHTDM_CONF_D_SRC)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf} "$(ETC_LIGHTDM_CONF_D)"/
-
-# Polkit rules files
-	# Use rsync -r as no symlinks are expected in rules files themselves, only recursive copy.
-	rsync -r "$(ETC_POLKIT_RULES_D_SRC)"/ "$(ETC_POLKIT_RULES_D)"/
-	find "$(ETC_POLKIT_RULES_D)"/ -type f -exec chmod 644 {} \; # Set permissions for rule files
-
 # XDG autostart files
 	# Use rsync -r as no symlinks are expected in autostart files themselves.
-	rsync -r "$(ETC_XDG_AUTOSTART_SRC)"/ "$(ETC)"/xdg/autostart/
-	find "$(ETC)"/xdg/autostart/ -type f -exec chmod 644 {} \; # Set permissions for files
+	rsync -r "$(ETC_XDG_AUTOSTART_SRC)"/ "$(ETC_XDG_AUTOSTART)"
+	find "$(ETC_XDG_AUTOSTART)"/ -type f -exec chmod 644 {} \;
+	
+# XDG menus file (etc/xdg/menus/bento-applications.menu)
+	install -m 644 "$(ETC_XDG_MENUS_SRC)" "$(ETC_XDG_MENUS)"/
+	# Also create the applications.menu symlink - This symlink will now be created here, not copied by rsync -l
+	ln -s "$(ETC_XDG_MENUS)"/bento-applications.menu "$(ETC_XDG_MENUS)"/applications.menu
 
 # Scripts for /usr/local/bin
 	# Use rsync -r as no symlinks are expected in scripts themselves.
 	rsync -r "$(USR_LOCAL_BIN_SRC)"/ "$(USR_LOCAL_BIN)"/
-	find "$(USR_LOCAL_BIN)"/ -type f -exec chmod 755 {} \; # Ensures scripts are executable
+	find "$(USR_LOCAL_BIN)"/ -type f -exec chmod 755 {} \;
 
 # Bento theme files for /usr/share/bento
 	# Use rsync -r as no symlinks are expected here.
 	rsync -r "$(USR_SHARE_BENTO_SRC)"/ "$(USR_SHARE_BENTO)"/
 	find "$(USR_SHARE_BENTO)"/ -type f -exec chmod 644 {} \;
-	find "$(USR_SHARE_BENTO)"/ -type d -exec chmod 755 {} \; # Ensure directories are traversable
+	find "$(USR_SHARE_BENTO)"/ -type d -exec chmod 755 {} \;
 
 # Openbox additional themes for /usr/share/themes
 	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
@@ -150,7 +152,6 @@ install:
 clean:
 	@echo "Starting uninstallation…"
 
-
 # Remove files/folders copied to /etc/skel by your project (selective removal)
 	rm -rf "$(ETC_SKEL)"/.bash_logout
 	rm -rf "$(ETC_SKEL)"/.jgmenurc
@@ -166,6 +167,7 @@ clean:
 	rm -f "$(ETC_XDG_MENUS)"/applications.menu # The symlink
 
 # Remove LightDM configuration files
+	rm -f "$ETC_LIGHTDM_CONF"/ligthdm-gtk-greeter.conf
 	rm -f "$(ETC_LIGHTDM_CONF_D)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf}
 
 # Polkit rules files
@@ -198,3 +200,4 @@ clean:
 	rm -f "$(USR_SHARE_ICONS)"/run.svg
 	rm -rf "$(USR_SHARE_ICONS)"/Vibrantly-Simple-Dark-Pink
 	rm -rf "$(USR_SHARE_ICONS)"/Vibrantly-Simple-Dark-Teal
+
