@@ -105,7 +105,6 @@ apt install -y --install-recommends \
 	hsetroot \
 	libfm-tools \
 	libfm4 \
-	lxappearance \
 	lxpanel \
 	pcmanfm \
 	sakura \
@@ -130,7 +129,7 @@ apt install -y --install-recommends \
 	wget
 echo "System tools group installed successfully."
 
-# --- Use preferences ---
+# --- User preferences ---
 echo "Installing User preferences packages and their dependencies..."
 apt install -y --install-recommends \
 	lxappearance \
