@@ -31,7 +31,8 @@
 
 ###############################################################################
 
-## THIS IS THE SETUP FOR Bento antiX 32 bits built on antiX Core 23.2 i486
+## THIS IS THE SETUP FOR Bento antiX 32 bits and 64bits built on antiX Core
+## 23.2 i486
 
 ## How to use this Makefile
 #  To install, type `make install` from within the root directory of the
@@ -102,7 +103,6 @@ install:
 	install -m 644 "$(ETC_LIGHTDM_CONF_D_SRC)"/{01_debian.conf,0_bento.conf,lightdm.conf,lightdm-gtk-greeter.conf} "$(ETC_LIGHTDM_CONF_D)"/
 
 # Polkit rules files
-	# Use rsync -r as no symlinks are expected in rules files themselves, only recursive copy.
 	rsync -r "$(ETC_POLKIT_RULES_D_SRC)"/ "$(ETC_POLKIT_RULES_D)"
 	find "$(ETC_POLKIT_RULES_D)" -type f -exec chmod 644 {} \;
 
@@ -114,11 +114,11 @@ install:
 	ln -s lang/menu.xml-en "${ETC_SKEL}/.config/openbox/menu.xml"
 	ln -s lang/rc.xml-en "${ETC_SKEL}/.config/openbox/rc.xml"
 
-# Set executable permission for oblocale.sh
+# Set executable permission
 	chmod a+x "$(ETC_SKEL)"/.config/openbox/scripts/oblocale.sh
 
 # Sysctl.d files
-	rsync -r "$ETC_SYSCTL_D_SRC" "$ETC_SYSCTL_D"
+	rsync -r "$ETC_SYSCTL_D_SRC"/ "$ETC_SYSCTL_D"
 	find "$ETC_SYSCTL_D" -type f -exec chmod 644 {} \;
 
 # XDG autostart files
@@ -127,29 +127,28 @@ install:
 	
 # XDG menus file (etc/xdg/menus/bento-applications.menu)
 	install -m 644 "$(ETC_XDG_MENUS_SRC)" "$(ETC_XDG_MENUS)"/
-	# Also create the applications.menu symlink - This symlink will now be created here, not copied by rsync -l
+	# Also create the applications.menu symlink
 	ln -s bento-applications.menu "${ETC_XDG_MENUS}/applications.menu"
 	
 # Scripts for /usr/local/bin
 	# Use rsync -r as no symlinks are expected in scripts themselves.
-	rsync -r "$(USR_LOCAL_BIN_SRC)"/ "$(USR_LOCAL_BIN)"/
+	rsync -r "$(USR_LOCAL_BIN_SRC)"/ "$(USR_LOCAL_BIN)"
 	find "$(USR_LOCAL_BIN)" -type f -exec chmod 755 {} \;
 
 # Bento theme files for /usr/share/bento
-	# Use rsync -r as no symlinks are expected here.
-	rsync -r "$(USR_SHARE_BENTO_SRC)"/ "$(USR_SHARE_BENTO)"/
+	rsync -r "$(USR_SHARE_BENTO_SRC)"/ "$(USR_SHARE_BENTO)"
 	find "$(USR_SHARE_BENTO)" -type f -exec chmod 644 {} \;
 	find "$(USR_SHARE_BENTO)" -type d -exec chmod 755 {} \;
 
 # Openbox additional themes for /usr/share/themes
-	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
-	rsync -rl "$(USR_SHARE_THEMES_SRC)"/ "$(USR_SHARE_THEMES)"/
+	# Use rsync -rl - many symlinks live in themes directories
+	rsync -rl "$(USR_SHARE_THEMES_SRC)"/ "$(USR_SHARE_THEMES)"
 	find "$(USR_SHARE_THEMES)" -type f -exec chmod 644 {} \;
 	find "$(USR_SHARE_THEMES)" -type d -exec chmod 755 {} \;
 
 # Icon sets for /usr/share/icons
-	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
-	rsync -rl "$(USR_SHARE_ICONS_SRC)"/ "$(USR_SHARE_ICONS)"/
+	# Use rsync -rl - many symlinks live in icons themes directories
+	rsync -rl "$(USR_SHARE_ICONS_SRC)"/ "$(USR_SHARE_ICONS)"
 	find "$(USR_SHARE_ICONS)" -type f -exec chmod 644 {} \;
 	find "$(USR_SHARE_ICONS)" -type d -exec chmod 755 {} \;
 
@@ -157,7 +156,7 @@ install:
 clean:
 	@echo "Starting uninstallation…"
 
-# Remove files/folders copied to /etc/skel by your project (selective removal)
+# Remove files/folders copied to /etc/skel
 	rm -rf "$(ETC_SKEL)"/.bash_logout
 	rm -rf "$(ETC_SKEL)"/.jgmenurc
 	rm -rf "$(ETC_SKEL)"/.vimrc
@@ -167,7 +166,7 @@ clean:
 	rm -rf "$(ETC_SKEL)"/.xsession
 	rm -rf "$(ETC_SKEL)"/.config/openbox
 
-# Remove XDG menus files and symlink (bento-applications.menu and its symlink)
+# Remove XDG menus files and symlink
 	rm -f "$(ETC_XDG_MENUS)"/bento-applications.menu
 	rm -f "$(ETC_XDG_MENUS)"/applications.menu # The symlink
 
