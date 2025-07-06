@@ -69,7 +69,7 @@ apt install -y --install-recommends \
 	iso-snapshot \
 	iso-snapshot-cli \
 	isolinux \
-	le3fpad \
+	l3afpad \
 	linux-libc-dev
 echo "antiX specific packages group installed successfully."
 
@@ -177,7 +177,7 @@ apt install -y --install-recommends \
 	openssh-server \
 	ppp \
 	pppconfig \
-	ppppoe \
+	pppoe \
 	sshfs \
 	usb-modeswitch \
 	wpasupplicant
@@ -188,7 +188,7 @@ echo "Installing Themes and their dependencies..."
 apt install -y --install-recommends \
 	adwaita-icon-theme \
 	clearlooks-phenix-theme \
-	gnome-accessibility-theme \
+	gnome-accessibility-themes \
 	gnome-icon-theme \
 	gnome-themes-extra \
 	gnome-themes-extra-data \
