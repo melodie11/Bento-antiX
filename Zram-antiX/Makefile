@@ -54,8 +54,8 @@ DEST_DESKTOP_DIR = $(DESTDIR)usr/share/applications
 
 # Main targets
 all:
-@# Type 'make install' to install ZRAM control scripts and configuration.
-@# Type 'make uninstall' to remove them.
+	@# Type 'make install' to install ZRAM control scripts and configuration.
+	@# Type 'make uninstall' to remove them.
 
 ## Installation target
 install:
@@ -63,34 +63,34 @@ install:
 # Copying files and setting permissions...
 
 # The default zram configuration file goes into /etc/default
-install -m 644 $(SRC_DEFAULT_CONF) $(DEST_DEFAULT_DIR)
+	install -m 644 $(SRC_DEFAULT_CONF) $(DEST_DEFAULT_DIR)
 
 # The zram init script goes into /etc/init.d
-install -m 755 $(SRC_INIT_SCRIPT) $(DEST_INIT_DIR)
+	install -m 755 $(SRC_INIT_SCRIPT) $(DEST_INIT_DIR)
 
 # The toggle-zram-gui.sh GUI script goes into /usr/local/bin
-install -m 755 $(SRC_GUI_SCRIPT) $(DEST_GUI_DIR)
+	install -m 755 $(SRC_GUI_SCRIPT) $(DEST_GUI_DIR)
 
 # The zram-control.desktop desktop file goes into /usr/share/applications
-install -m 644 $(SRC_DESKTOP_FILE) $(DEST_DESKTOP_DIR)
+	install -m 644 $(SRC_DESKTOP_FILE) $(DEST_DESKTOP_DIR)
 
 # Starting ZRAM service...
 # Ensure the post-install script is executable before running it
-chmod +x $(SRC_POST_INSTALL)
+	chmod +x $(SRC_POST_INSTALL)
 # Execute the post-install script, passing DESTDIR as an argument for packaging awareness
 # This script is responsible for managing update-rc.d or similar system configurations.
-./$(SRC_POST_INSTALL) $(DESTDIR)
+	./$(SRC_POST_INSTALL) $(DESTDIR)
 
 # Uninstallation target
 uninstall:
 # Ensure the post-removal script is executable before running it
-chmod +x $(SRC_POST_REMOVAL)
+	chmod +x $(SRC_POST_REMOVAL)
 # Execute the post-removal script, passing DESTDIR as an argument for packaging awareness
-./$(SRC_POST_REMOVAL) $(DESTDIR)
+	./$(SRC_POST_REMOVAL) $(DESTDIR)
 
 # Removing installed files...
-rm -f $(DEST_DEFAULT_FILE)
-rm -f $(DEST_INIT_FILE)
-rm -f $(DEST_GUI_FILE)
-rm -f $(DEST_DESKTOP_FILE)
+	rm -f $(DEST_DEFAULT_FILE)
+	rm -f $(DEST_INIT_FILE)
+	rm -f $(DEST_GUI_FILE)
+	rm -f $(DEST_DESKTOP_FILE)
 
