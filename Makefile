@@ -55,6 +55,7 @@ ETC_LIGHTDM_CONF_SRC=etc/lightdm/lightdm-gtk-greeter.conf
 ETC_LIGHTDM_CONF_D_SRC=etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D_SRC=etc/polkit-1/rules.d
 ETC_SUDOERS_D_SRC=etc/sudoers.d
+ETC_SYSCTL_D_SRC=etc/sysctl.d
 ETC_SKEL_SRC=etc/skel
 ETC_XDG_AUTOSTART_SRC=etc/xdg/autostart
 ETC_XDG_MENUS_SRC=etc/xdg/menus/bento-applications.menu
@@ -73,6 +74,7 @@ ETC_XDG_MENUS=/etc/xdg/menus
 ETC_LIGHTDM_CONF=/etc/lightdm
 ETC_LIGHTDM_CONF_D=/etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D=/etc/polkit-1/rules.d
+ETC_SYSCTL_D=/etc/sysctl.d
 ETC_SKEL=/etc/skel
 USR_LOCAL_BIN=/usr/local/bin
 USR_SHARE=/usr/share
@@ -102,51 +104,54 @@ install:
 # Polkit rules files
 	# Use rsync -r as no symlinks are expected in rules files themselves, only recursive copy.
 	rsync -r "$(ETC_POLKIT_RULES_D_SRC)"/ "$(ETC_POLKIT_RULES_D)"
-	find "$(ETC_POLKIT_RULES_D)"/ -type f -exec chmod 644 {} \;
+	find "$(ETC_POLKIT_RULES_D)" -type f -exec chmod 644 {} \;
 
 # Folders and files from etc/skel go to /etc/skel
 	rsync -r "$(ETC_SKEL_SRC)"/ "$(ETC_SKEL)"
 
 # Create symlinks for Openbox config files in /etc/skel/.config/openbox
-	ln -s "$(ETC_SKEL)"/.config/openbox/lang/autostart-en "$(ETC_SKEL)"/.config/openbox/autostart
-	ln -s "$(ETC_SKEL)"/.config/openbox/lang/menu.xml-en "$(ETC_SKEL)"/.config/openbox/menu.xml
-	ln -s "$(ETC_SKEL)"/.config/openbox/lang/rc.xml-en "$(ETC_SKEL)"/.config/openbox/rc.xml
+	ln -s lang/autostart-en "${ETC_SKEL}/.config/openbox/autostart"
+	ln -s lang/menu.xml-en "${ETC_SKEL}/.config/openbox/menu.xml"
+	ln -s lang/rc.xml-en "${ETC_SKEL}/.config/openbox/rc.xml"
 
 # Set executable permission for oblocale.sh
 	chmod a+x "$(ETC_SKEL)"/.config/openbox/scripts/oblocale.sh
 
+# Sysctl.d files
+	rsync -r "$ETC_SYSCTL_D_SRC" "$ETC_SYSCTL_D"
+	find "$ETC_SYSCTL_D" -type f -exec chmod 644 {} \;
+
 # XDG autostart files
-	# Use rsync -r as no symlinks are expected in autostart files themselves.
 	rsync -r "$(ETC_XDG_AUTOSTART_SRC)"/ "$(ETC_XDG_AUTOSTART)"
-	find "$(ETC_XDG_AUTOSTART)"/ -type f -exec chmod 644 {} \;
+	find "$(ETC_XDG_AUTOSTART)" -type f -exec chmod 644 {} \;
 	
 # XDG menus file (etc/xdg/menus/bento-applications.menu)
 	install -m 644 "$(ETC_XDG_MENUS_SRC)" "$(ETC_XDG_MENUS)"/
 	# Also create the applications.menu symlink - This symlink will now be created here, not copied by rsync -l
-	ln -s "$(ETC_XDG_MENUS)"/bento-applications.menu "$(ETC_XDG_MENUS)"/applications.menu
-
+	ln -s bento-applications.menu "${ETC_XDG_MENUS}/applications.menu"
+	
 # Scripts for /usr/local/bin
 	# Use rsync -r as no symlinks are expected in scripts themselves.
 	rsync -r "$(USR_LOCAL_BIN_SRC)"/ "$(USR_LOCAL_BIN)"/
-	find "$(USR_LOCAL_BIN)"/ -type f -exec chmod 755 {} \;
+	find "$(USR_LOCAL_BIN)" -type f -exec chmod 755 {} \;
 
 # Bento theme files for /usr/share/bento
 	# Use rsync -r as no symlinks are expected here.
 	rsync -r "$(USR_SHARE_BENTO_SRC)"/ "$(USR_SHARE_BENTO)"/
-	find "$(USR_SHARE_BENTO)"/ -type f -exec chmod 644 {} \;
-	find "$(USR_SHARE_BENTO)"/ -type d -exec chmod 755 {} \;
+	find "$(USR_SHARE_BENTO)" -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_BENTO)" -type d -exec chmod 755 {} \;
 
 # Openbox additional themes for /usr/share/themes
 	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
 	rsync -rl "$(USR_SHARE_THEMES_SRC)"/ "$(USR_SHARE_THEMES)"/
-	find "$(USR_SHARE_THEMES)"/ -type f -exec chmod 644 {} \;
-	find "$(USR_SHARE_THEMES)"/ -type d -exec chmod 755 {} \;
+	find "$(USR_SHARE_THEMES)" -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_THEMES)" -type d -exec chmod 755 {} \;
 
 # Icon sets for /usr/share/icons
 	# Use rsync -rl as per your instruction (safer if they internally use symlinks).
 	rsync -rl "$(USR_SHARE_ICONS_SRC)"/ "$(USR_SHARE_ICONS)"/
-	find "$(USR_SHARE_ICONS)"/ -type f -exec chmod 644 {} \;
-	find "$(USR_SHARE_ICONS)"/ -type d -exec chmod 755 {} \;
+	find "$(USR_SHARE_ICONS)" -type f -exec chmod 644 {} \;
+	find "$(USR_SHARE_ICONS)" -type d -exec chmod 755 {} \;
 
 ## UNINSTALL
 clean:
