@@ -49,7 +49,8 @@ SHELL := /bin/bash
 
 ## Source Files and Directories (relative to the project root)
 # etc/
-ETC_SRC_DIR=etc
+ETC_SRC=etc
+ETC_DEFAULT_SRC=etc/default/grub
 ETC_SKEL_SRC=etc/skel
 ETC_LIGHTDM_CONF_D_SRC=etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D_SRC=etc/polkit-1/rules.d
@@ -66,6 +67,7 @@ USR_SHARE_THEMES_SRC=usr/share/themes
 
 ## Destination Directories (absolute paths on the system)
 ETC=/etc
+ETC_DEFAULT=/etc/default/
 ETC_XDG_MENUS=/etc/xdg/menus
 ETC_LIGHTDM_CONF_D=/etc/lightdm/lightdm.conf.d
 ETC_POLKIT_RULES_D=/etc/polkit-1/rules.d
@@ -81,8 +83,14 @@ install:
 	@echo "Installing Bento antiX components..."
 
 # /etc/environment and /etc/inittab
-	install -m 644 "$(ETC_SRC_DIR)"/environment "$(ETC)"/
-	install -m 644 "$(ETC_SRC_DIR)"/inittab "$(ETC)"/
+	install -m 644 "$(ETC_SRC)"/environment "$(ETC)"/
+	install -m 644 "$(ETC_SRC)"/inittab "$(ETC)"/
+
+# Grub without background
+	install -m 644 "$ETC_DEFAULT_SRC" "$ETC_DEFAULT"
+
+	@echo "Updating Grub"
+	update-grub2
 	
 # Folders and files from etc/skel go to /etc/skel
 # Use rsync -r because symlinks will be created explicitly afterwards.
