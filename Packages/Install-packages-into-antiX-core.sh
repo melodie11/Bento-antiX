@@ -70,7 +70,8 @@ apt install -y --install-recommends \
 	iso-snapshot-cli \
 	isolinux \
 	l3afpad \
-	linux-libc-dev
+	linux-libc-dev \
+	zstd
 echo "antiX specific packages group installed successfully."
 
 # --- Bento main ---
