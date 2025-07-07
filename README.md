@@ -6,26 +6,27 @@ friendly desktop environment in Linux distributions.
 * This setup is provided for an antiX Linux distribution, without any warranty it
 will work for you, for any purpose, personal, professional or otherwise.
 
-* It has been put up using an **antiX 32bits core 23.2** version, and might not work
-as is in another edition, even one provided by the antiX community.
+* It has been put up using an **antiX 32bits core 23.2** version, and has since
+been also used with a **antiX 64bits Core 23.3** edition. It could be working
+with other **antiX Linux** versions, but we can't guarantee it.
 
-* Also it does not include (yet) instructions or advice on which packages are
-needed for a full blown desktop using this setup.
+* A new *Packages* directory was just added. You will find the script we used to
+build a **Bento antiX 64** edition from an **antiX Linux 64bits Core 23.3**.
 
 ## Presentation
-[Openbox](https://openbox.org) is a Window Manager developped by Dana Jansens
-and several other people, meant for simplicity and lightness in the use of
-GNU/Linux distributions.
+[Openbox](https://openbox.org) is an advanced Window Manager developped by Dana 
+Jansens and several other people, meant for simplicity and lightness in the use 
+of GNU/Linux distributions.
 
-Bento Openbox is a recipe to provide the Openbox Window Manager along with two
+**Bento Openbox** is a recipe to provide the *Openbox Window Manager* along with two
 other tools and a set of prebuilt configurations to make it easy for anyone to
 use.
 
-This allows your GNU/Linux operating system to be lighter than most, and is fit
-to be used in a variety of aging computers.
+This allows your GNU/Linux operating system to be lighter than most, while fit
+to be used by everyone, in a variety of aging computers.
 
 
-## Brief history
+## Brief history of Bento Openbox
 It has been delivered in several prebuilt distributions since 2009, through
 [Linuxvillage](https://linuxvillage.org), and before at [PCLinuxOS-Fr.org](https://pclinuxos-fr.org)
 
@@ -59,15 +60,16 @@ back from `/etc/skel` to your personal directory.
 ## Dependencies
 To get the full benefits from the files provided here, you will need the
 following packages:
-* openbox
+
+### openbox
 Already introduced in the above presentation.
 
-* obconf
+### obconf
 If your distribution does not pull it in when you install openbox, you should
 add this one, which will let you configure several items in a graphical window,
 such as the windows themes, the margins, the openbox menu fonts…
 
-* openbox-menu
+### openbox-menu
 It provides a dynamic menu such as what can be found in regular Desktop
 Environments. To do that, it makes use of the library libmenu-cache from the
 LXDE project. It allows avoiding **other dependencies** from the LXDE Desktop
@@ -78,7 +80,7 @@ If your distribution does not provide it, you can package it, or compile it from
 its author's repository : https://github.com/fabriceT/openbox-menu. If you
 package it for your distribution, we will be happy to read about it!
 
-* obsession
+### obsession
 It provides a shutdown/reboot/logout/sleep/hibernation menu such as the one
 provided by LXDE. It also comes from a component of the LXDE project, but unlike
 the one belonging to the LXDE suite, it comes with **a limited set** of
