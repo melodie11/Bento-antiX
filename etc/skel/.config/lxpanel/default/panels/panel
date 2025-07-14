@@ -99,6 +99,16 @@ Plugin {
   expand=0
 }
 Plugin {
+  type=netstat
+  Config {
+  }
+}
+Plugin {
+  type=space
+  Config {
+  }
+}
+Plugin {
   type=tray
   Config {
   }
