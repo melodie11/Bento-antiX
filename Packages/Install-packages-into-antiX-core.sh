@@ -16,7 +16,7 @@ apt purge -y --autoremove elinks irssi libpam-elogind
 apt full-upgrade -y # Corrected from dist-upgrade to full-upgrade
 echo "Initial system update and cleanup complete."
 
-# --- Xorg server ---
+#  Xorg server 
 echo "Installing Xorg server and its dependencies..."
 apt install -y --install-recommends \
 	mesa-utils \
@@ -26,10 +26,12 @@ apt install -y --install-recommends \
 	xinput \
 	xinit \
 	xorg \
-	xserver-xorg
+	xserver-xorg \
+	xserver-xorg-input-synaptics
+	
 echo "Xorg server group installed successfully."
 
-# --- Sub-system ---
+#  Sub-system 
 echo "Installing Sub-system components and their dependencies..."
 apt install -y --install-recommends \
 	accountsservice \
@@ -53,7 +55,7 @@ apt install -y --install-recommends \
 	upower
 echo "Sub-system group installed successfully."
 
-# --- Graphical session ---
+#  Graphical session 
 echo "Installing Graphical session components and their dependencies..."
 apt install -y --install-recommends \
 	lightdm \
@@ -63,7 +65,7 @@ apt install -y --install-recommends \
 	lightdm-settings
 echo "Graphical session group installed successfully."
 
-# --- Needed in antiX ---
+#  Needed in antiX 
 echo "Installing antiX specific packages and their dependencies..."    "====> Le3fpad n'était pas installé"
 apt install -y --install-recommends \
 	iso-snapshot \
@@ -74,7 +76,7 @@ apt install -y --install-recommends \
 	zstd
 echo "antiX specific packages group installed successfully."
 
-# --- Bento main ---
+#  Bento main 
 echo "Installing Bento main packages and their dependencies..."
 apt install -y --install-recommends \
 	libmenu-cache3 \
@@ -82,7 +84,7 @@ apt install -y --install-recommends \
 	obsession
 echo "Bento main group installed successfully."
 
-# --- To compile openbox-menu (can be removed later) ---
+#  To compile openbox-menu (can be removed later) 
 echo "Installing packages for compiling openbox-menu and their dependencies..."
 apt install -y --install-recommends \
 	build-essential \
@@ -91,13 +93,13 @@ apt install -y --install-recommends \
 	libmenu-cache-dev
 echo "openbox-menu compilation packages group installed successfully."
 
-# --- Drivers ---
+#  Drivers 
 echo "Installing Drivers and their dependencies..."
 apt install -y --install-recommends \
 	va-driver-all
 echo "Drivers group installed successfully."
 
-# --- Bento additions ---
+#  Bento additions 
 echo "Installing Bento additions and their dependencies..."
 apt install -y --install-recommends \
 	arandr \
@@ -114,7 +116,7 @@ apt install -y --install-recommends \
 	yad
 echo "Bento additions group installed successfully."
 
-# --- System tools - text and GUI ---
+#  System tools - text and GUI 
 echo "Installing System tools (text and GUI) and their dependencies..."
 apt install -y --install-recommends \
 	apt-file \
@@ -127,24 +129,27 @@ apt install -y --install-recommends \
 	software-properties-gtk \
 	synaptic \
 	vim \
-	wget
+	wget \
+	ntp \
+	rsyslog
+	
 echo "System tools group installed successfully."
 
-# --- User preferences ---
+#  User preferences 
 echo "Installing User preferences packages and their dependencies..."
 apt install -y --install-recommends \
 	lxappearance \
 	qt5ct
 echo "User preferences group installed successfully."
 
-# --- Audio ---
+#  Audio 
 echo "Installing Audio packages and their dependencies..."
 apt install -y --install-recommends \
 	pavucontrol \
 	volumeicon-alsa
 echo "Audio group installed successfully."
 
-# --- Base tools ---
+#  Base tools 
 echo "Installing Base tools and their dependencies..."
 apt install -y --install-recommends \
 	file-roller \
@@ -154,13 +159,13 @@ apt install -y --install-recommends \
 	zip
 echo "Base tools group installed successfully."
 
-# --- Printing ---
+#  Printing 
 echo "Installing Printing packages and their dependencies..."
 apt install -y --install-recommends \
 	bluez-cups
 echo "Printing group installed successfully."
 
-# --- Networking ---
+#  Networking 
 echo "Installing Networking packages and their dependencies..."
 apt install -y --install-recommends \
 	bind9 \
@@ -168,7 +173,6 @@ apt install -y --install-recommends \
 	bluez-firmware \
 	broadcom-sta-dkms \
 	connman \
-	connman-gtk \
 	connman-ui \
 	dnsutils \
 	modemmanager \
@@ -184,7 +188,7 @@ apt install -y --install-recommends \
 	wpasupplicant
 echo "Networking group installed successfully."
 
-# --- Themes ---
+#  Themes 
 echo "Installing Themes and their dependencies..."
 apt install -y --install-recommends \
 	adwaita-icon-theme \
@@ -197,7 +201,7 @@ apt install -y --install-recommends \
 	gtk2-engines
 echo "Themes group installed successfully."
 
-# --- fonts ---
+#  fonts 
 echo "Installing fonts and their dependencies..."
 apt install -y --install-recommends \
 	fontconfig \
@@ -208,13 +212,14 @@ apt install -y --install-recommends \
 	xfonts-terminus
 echo "fonts group installed successfully."
 
-# --- Test and run ISOs in Virtualbox ---
-echo "Installing Virtualbox ISO testing tools and their dependencies..."
-apt install -y --install-recommends \
-	virtualbox-guest-dkms \
-	virtualbox-guest-utils \
-	virtualbox-guest-x11
-echo "Virtualbox ISO testing tools group installed successfully."
+#  Test and run ISOs in Virtualbox 
+# Optional uncomment the following lines if needed
+#echo "Installing Virtualbox ISO testing tools and their dependencies..."
+#apt install -y --install-recommends \
+#	virtualbox-guest-dkms \
+#	virtualbox-guest-utils \
+#	virtualbox-guest-x11
+#echo "Virtualbox ISO testing tools group installed successfully."
 
 echo "All specified packages have been processed."
 
