@@ -131,6 +131,8 @@ apt install -y --install-recommends \
 	vim \
 	wget \
 	ntp \
+	lshw \
+	inxi \
 	rsyslog
 	
 echo "System tools group installed successfully."
@@ -185,7 +187,9 @@ apt install -y --install-recommends \
 	pppoe \
 	sshfs \
 	usb-modeswitch \
-	wpasupplicant
+	wpasupplicant \
+	wireless-regdb
+	
 echo "Networking group installed successfully."
 
 #  Themes 
