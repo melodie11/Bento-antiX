@@ -21,7 +21,8 @@ echo "Installing Xorg server and its dependencies..."
 apt install -y --install-recommends \
 	mesa-utils \
 	xbitmaps \
-	/xfonts-100dpi \
+	xfonts-100dpi \
+	xfonts-75dpi \
 	xfonts-scalable \
 	xinput \
 	xinit \
@@ -212,6 +213,7 @@ echo "Themes group installed successfully."
 echo "Installing fonts and their dependencies..."
 apt install -y --install-recommends \
 	fontconfig \
+	fonts-dejavu \
 	fonts-crosextra-carlito \
 	fonts-droid-fallback \
 	fonts-noto-mono \
