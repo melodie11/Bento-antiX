@@ -21,7 +21,7 @@ echo "Installing Xorg server and its dependencies..."
 apt install -y --install-recommends \
 	mesa-utils \
 	xbitmaps \
-	xfonts-100dpi \
+	/xfonts-100dpi \
 	xfonts-scalable \
 	xinput \
 	xinit \
@@ -53,6 +53,9 @@ apt install -y --install-recommends \
 	udev \
 	udisks2 \
 	upower
+#	linux-headers-amd64 either or
+#	linux-headers-i486
+ 
 echo "Sub-system group installed successfully."
 
 #  Graphical session 
@@ -170,7 +173,7 @@ echo "Printing group installed successfully."
 #  Networking 
 echo "Installing Networking packages and their dependencies..."
 apt install -y --install-recommends \
-	bind9 \
+#	bind9 \ optional
 	bluez \
 	bluez-firmware \
 	broadcom-sta-dkms \
