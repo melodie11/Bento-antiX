@@ -9,13 +9,13 @@ xdg-user-dirs-update
 source "${HOME}"/.config/user-dirs.dirs
 
 if [[ -z "${XDG_DESKTOP_DIR}" ]]; then
-    echo "Empty XDG_DESKTOP_DIR variable" >&2 # Rediriger vers stderr
-    exit 1 # Utiliser un code de sortie non-zéro pour erreur
+    echo "Empty XDG_DESKTOP_DIR variable" >&2 # Redirect to stderr
+    exit 1 # Use a non zero exit code for error
 fi
 
 if [[ ! -d "${XDG_DESKTOP_DIR}" ]]; then
-    echo "The location of the desktop does not exist: ${XDG_DESKTOP_DIR}" >&2 # Rediriger vers stderr
-    exit 1 # Utiliser un code de sortie non-zéro pour erreur
+    echo "The location of the desktop does not exist: ${XDG_DESKTOP_DIR}" >&2 # Redirect to stderr
+    exit 1
 fi
 
 # Are we in a live session? We want this to happen only in this case
@@ -23,9 +23,9 @@ fi
 if [ -d "/live" ]; then
     PRIMARY_SOURCE="/usr/share/applications/minstall.desktop"
     SKEL_FALLBACK_SOURCE="/etc/skel/.local/share/applications/minstall.desktop"
-    DEST_PATH="${XDG_DESKTOP_DIR}/minstall.desktop" # Utiliser un chemin complet pour la destination
+    DEST_PATH="${XDG_DESKTOP_DIR}/minstall.desktop"
 
-    # --- Logic: Check primary source first, then fallback ---
+    # Check primary source first, then fallback
 
     if [ -f "$PRIMARY_SOURCE" ]; then
         # If minstall.desktop exists in the primary location, copy it.
@@ -47,8 +47,5 @@ else
     # Not in a live session, so exit cleanly as per original script logic.
     exit 0
 fi
-
-# You can add more tasks here that depend on the minstall.desktop being copied,
-# or simply let the script finish.
 
 exit 0 # Exit cleanly after executing the logic
