@@ -1,6 +1,8 @@
 #!/bin/bash
 #
 # ZRAM control script with YAD graphical interface.
+# Uses gksu for authentication.
+# Displays final status based on actual ZRAM state.
 #
 # Debugging lines - Uncomment two next lines to debug
 # REMOVE THESE LINES AFTER DEBUGGING IF NOT NEEDED ANYMORE!
@@ -45,15 +47,14 @@ show_temporary_message() {
     esac
 
     notify-send --expire-time=3000 --icon="$icon" "$title" "$text" 2>/dev/null &
-    yad --title="$title" --text="$text" --image="$icon" --timeout="$timeout_seconds" --no-buttons --center &
+    yad --title="$title" --text="$text" --image="$icon" --timeout=$timeout_seconds --no-buttons --center &
 }
 
 
-# --- Script Execution Start ---
-
-# Check if YAD is installed
-if ! command -v yad &> /dev/null; then
-    show_final_message error "Error" "YAD is not installed. Please install it to use this script."
+# Script Execution
+# Check if gksu is installed
+if ! command -v gksu &> /dev/null; then
+    show_final_message error "Error" "gksu is not installed. Please install it to use this script."
     exit 1
 fi
 
@@ -66,6 +67,8 @@ fi
 # Main script logic based on arguments
 case "$1" in
     start|stop)
+        # These declarations are NOT 'local' because they are at the top level
+        # of this case block, not inside a function.
         action_verb="$1"
         action_past_participle=""
 
@@ -78,14 +81,15 @@ case "$1" in
         # Display a temporary message while the operation is in progress
         show_temporary_message info "ZRAM Control" "Attempting to ${action_verb} ZRAM..." 3
 
-        # Execute the ZRAM init script directly. Assumes root privileges are already granted.
-        # Output is redirected to a temporary log for potential debugging of the init script itself.
-        temp_log="/tmp/zram_script_output.log"
-        "${ZRAM_INIT_SCRIPT}" "$action_verb" > "$temp_log" 2>&1
-        command_status=$? # Status of the init script command
+        # Execute the command with gksu. gksu will display its own password prompt.
+        # We redirect stdout/stderr to a temporary log file for potential debugging,
+        # but we will primarily rely on /proc/swaps for status.
+        temp_log="/tmp/zram_gksu_output.log"
+        gksu "${ZRAM_INIT_SCRIPT}" "$action_verb" > "$temp_log" 2>&1
+        gksu_command_status=$? # Status of gksu command itself
 
         # Check the actual state of ZRAM after the command execution
-        zram_active=$(grep -c "/dev/zram" /proc/swaps) # Count active zram devices
+        zram_active=$(cat /proc/swaps | grep -c "/dev/zram") # Count active zram devices
 
         # Determine success/failure based on actual ZRAM state
         if [ "$action_verb" = "start" ]; then
@@ -93,14 +97,14 @@ case "$1" in
                 show_final_message info "ZRAM Control" "ZRAM ${action_past_participle} successfully."
             else
                 # If ZRAM is not active after a 'start' command, it's a failure.
-                show_final_message error "ZRAM Error" "Failed to ${action_verb} ZRAM. Exit status: $command_status. Check logs for details: $temp_log"
+                show_final_message error "ZRAM Error" "Failed to ${action_verb} ZRAM. Gksu status: $gksu_command_status. Check logs for details: $temp_log"
             fi
         elif [ "$action_verb" = "stop" ]; then
             if [ "$zram_active" -eq 0 ]; then
                 show_final_message info "ZRAM Control" "ZRAM ${action_past_participle} successfully."
             else
                 # If ZRAM is still active after a 'stop' command, it's a failure.
-                show_final_message error "ZRAM Error" "Failed to ${action_verb} ZRAM. Exit status: $command_status. Check logs for details: $temp_log"
+                show_final_message error "ZRAM Error" "Failed to ${action_verb} ZRAM. Gksu status: $gksu_command_status. Check logs for details: $temp_log"
             fi
         fi
 
