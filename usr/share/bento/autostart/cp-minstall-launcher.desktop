@@ -1,0 +1,14 @@
+[Desktop Entry]
+Encoding=UTF-8
+Version=1.0
+Type=Application
+Name=Copy launcher for antiX installer
+Name[fr]=Copier le lanceur de l'installeur antiX
+Comment=Script install launcher copy
+Comment[fr]=Copie du lanceur de l'installeur antiX
+TryExec=bento-antix.desktop.sh
+Exec=bento-antix.desktop.sh
+StartupNotify=false
+Terminal=false
+Hidden=false
+
