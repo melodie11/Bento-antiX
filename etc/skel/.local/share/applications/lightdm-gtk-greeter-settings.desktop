@@ -41,10 +41,11 @@ Comment[pt_BR]=Configure o LightDM GTK+ Greeter
 Comment[ru]=Настройка LightDM GTK+ Greeter
 Comment[sv]=Anpassa LightDM GTK+ Greeter
 Comment[zh_CN]=配置 LightDM 桌面管理器（GTK+ 界面）
-Categories=System;Utility;
+Categories=GNOME;GTK;System;
 Keywords=Configuration;Utility;
-Exec=lightdm-gtk-greeter-settings-pkexec
+Exec=gksu -S lightdm-gtk-greeter-settings
 Icon=lightdm-gtk-greeter-settings
 Terminal=false
 Type=Application
 X-XfcePluggable=true
+
