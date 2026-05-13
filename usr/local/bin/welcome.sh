@@ -1,11 +1,13 @@
 #!/bin/bash
 #
-# Script to create an info file on the Live desktop.
-#
+# Script to create an information file on the Live desktop.
+
+# Exit immediately if a command exits with a non-zero status.
+set -e
 
 # Define the content of the info file
 MESSAGE_CONTENT="
-(EN) Welcome to Bento antiX 32bits!
+(EN) Welcome to Bento antiX!
 
 The default password for root is \"root\"
 The default password for the user is \"demo\"
@@ -14,10 +16,9 @@ The installer and most administration tools usually need only the default user p
 You will be invited to create your own during installation.
 
 We hope you enjoy this distribution.
-
 ---
 
-/!\\ Post-installation Information /!\\
+/!\ Post-installation Information /!\
 
 This file contains the details of temporary passwords specific
 to the Live session.
@@ -29,9 +30,16 @@ after installation.
 You will then need to delete it manually once the installation
 is complete and the new system has booted.
 
+-
+
+This antiX spinoff is configured for all available languages. After installation
+please use "dpkg-reconfigure locales" (with admin rights) to setup your own language
+system wide, and avoid having the long list of all languages applied to the system
+when updating or adding packages.
+
 ---
 
-(FR) Bienvenue sur Bento antiX 32bits !
+(FR) Bienvenue sur Bento antiX !
 
 Le mot de passe par défaut pour root est \"root\"
 Le mot de passe par défaut pour l'utilisateur est \"demo\"
@@ -50,58 +58,43 @@ Ce fichier contient les détail des mots de passe temporaires spécifiques
 à la session Live.
 
 Si vous choisissez d'installer le système sur votre disque dur et
-de \"conserver les modifications faites en Live\", CE FICHIER SE
+de \"consolider les modifications faites en Live\", CE FICHIER SE
 RETROUVERA SUR VOTRE BUREAU après l'installation.
 
 Vous devrez alors le supprimer manuellement une fois l'installation
 terminée et le nouveau système démarré.
 
+-
+
+Cette version dérivée d'antiX est configurée pour inclure toutes les langues
+disponibles. Après l'installation, veuillez utiliser la commande "dpkg-reconfigure locales"
+(avec les droits root) afin de paramétrer votre propre langue pour l'ensemble du
+système, et éviter d'avoir la longue liste de langues configurées lors des mises
+à jour ou de l'ajout de nouveaux paquets.
+
 "
 
-# Define the output file name
+# Output file name
 OUTPUT_FILENAME="INSTALLATION.TXT"
 
-# --- Live Session Check ---
-# Are we in a live session? We want this to happen only in this case
+# The script should only run in a Live session.
 if [ ! -d "/live" ]; then
+    echo "Script is not executed in a Live session. Exiting."
     exit 0
 fi
 
-# --- Determine the active graphical user and their home directory ---
-# Find the display number, typically :0 or :1
-# 'who' can show active users and their display, 'logname' gets login name
-# However, for scripts run via xdg/autostart, the display and user should already be set.
-# A more robust way to find the actual logged-in graphical user:
-GRAPHICAL_USER=$(logname 2>/dev/null || who | awk '{print $1}' | sort -u | head -n 1)
+# The default user in antiX live distributions and live respins
+USER="demo"
 
-# Fallback if logname/who fails or returns multiple users (e.g., 'demo')
-if [ -z "$GRAPHICAL_USER" ]; then
-    # Common antiX live user
-    GRAPHICAL_USER="demo"
-fi
+# Use XDG_DESKTOP_DIR, else fall back to the standard 'demo' user path
+DESKTOP_DIR="${XDG_DESKTOP_DIR:-/home/${USER}/Desktop}"
 
-# Get the home directory of that user
-USER_HOME=$(eval echo "~$GRAPHICAL_USER")
+# We write the content to the file on the desktop
+echo "$MESSAGE_CONTENT" | tee "$DESKTOP_DIR/$OUTPUT_FILENAME" > /dev/null
 
-# --- Desktop Directory Determination ---
-# Ensure user-dirs are updated for the target user if necessary
-# This might require running as the user, which is complex from a root-run script.
-# A simpler approach is to assume standard Desktop path for the target user.
-
-DESKTOP_DIR="${USER_HOME}/Desktop" # Default to ~/Desktop for the target user
-
-# Create the Desktop directory if it doesn't exist for the target user
-if [ ! -d "$DESKTOP_DIR" ]; then
-    mkdir -p "$DESKTOP_DIR"
-    # Set appropriate ownership if created by root
-    chown "$GRAPHICAL_USER":"$GRAPHICAL_USER" "$DESKTOP_DIR"
-fi
-
-# --- Write the content to the file on the desktop ---
-echo "$MESSAGE_CONTENT" > "$DESKTOP_DIR/$OUTPUT_FILENAME"
-
-# Set ownership and permissions for the created file
-chown "$GRAPHICAL_USER":"$GRAPHICAL_USER" "$DESKTOP_DIR/$OUTPUT_FILENAME"
+# Set rights and permissions for the created file 
+chown "$USER":"$USER" "$DESKTOP_DIR/$OUTPUT_FILENAME"
+.
 chmod a+r "$DESKTOP_DIR/$OUTPUT_FILENAME"
 
 exit 0
