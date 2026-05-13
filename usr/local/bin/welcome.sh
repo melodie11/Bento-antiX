@@ -33,7 +33,7 @@ is complete and the new system has booted.
 -
 
 This antiX spinoff is configured for all available languages. After installation
-please use "dpkg-reconfigure locales" (with admin rights) to setup your own language
+please use \"dpkg-reconfigure locales\" (with admin rights) to setup your own language
 system wide, and avoid having the long list of all languages applied to the system
 when updating or adding packages.
 
@@ -67,7 +67,7 @@ terminée et le nouveau système démarré.
 -
 
 Cette version dérivée d'antiX est configurée pour inclure toutes les langues
-disponibles. Après l'installation, veuillez utiliser la commande "dpkg-reconfigure locales"
+disponibles. Après l'installation, veuillez utiliser la commande \"dpkg-reconfigure locales\"
 (avec les droits root) afin de paramétrer votre propre langue pour l'ensemble du
 système, et éviter d'avoir la longue liste de langues configurées lors des mises
 à jour ou de l'ajout de nouveaux paquets.
@@ -94,7 +94,7 @@ echo "$MESSAGE_CONTENT" | tee "$DESKTOP_DIR/$OUTPUT_FILENAME" > /dev/null
 
 # Set rights and permissions for the created file 
 chown "$USER":"$USER" "$DESKTOP_DIR/$OUTPUT_FILENAME"
-.
+
 chmod a+r "$DESKTOP_DIR/$OUTPUT_FILENAME"
 
 exit 0
