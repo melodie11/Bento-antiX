@@ -86,8 +86,16 @@ fi
 # The default user in antiX live distributions and live respins
 USER="demo"
 
-# Use XDG_DESKTOP_DIR, else fall back to the standard 'demo' user path
-DESKTOP_DIR="${XDG_DESKTOP_DIR:-/home/${USER}/Desktop}"
+# Detect the desktop directory: use XDG_DESKTOP_DIR if set,
+# else read it from user-dirs.dirs, else fall back to ~/Desktop
+if [ -n "${XDG_DESKTOP_DIR}" ]; then
+    DESKTOP_DIR="${XDG_DESKTOP_DIR}"
+elif [ -f "/home/${USER}/.config/user-dirs.dirs" ]; then
+    DESKTOP_DIR=$(grep "^XDG_DESKTOP_DIR" "/home/${USER}/.config/user-dirs.dirs" \
+        | cut -d= -f2 | tr -d '"' | sed "s|\$HOME|/home/${USER}|")
+else
+    DESKTOP_DIR="/home/${USER}/Desktop"
+fi
 
 # We write the content to the file on the desktop
 echo "$MESSAGE_CONTENT" | tee "$DESKTOP_DIR/$OUTPUT_FILENAME" > /dev/null
