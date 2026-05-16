@@ -9,5 +9,5 @@ Comment[fr]=Crée un fichier "INFORMATION.TXT" sur le bureau live
 Exec=welcome.sh
 StartupNotify=false
 Terminal=false
-Hidden=true
+Hidden=false
 
